@@ -1,26 +1,37 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brazuca Theme Colors */
+  --color-brazuca-blue: #0055A4;
+  --color-brazuca-blue-dark: #002B7F;
+  --color-brazuca-green: #009B3A;
+  --color-brazuca-orange: #FF5C00;
+  --color-brazuca-dark: #001C55;
+  --color-brazuca-light: #F0F4F8;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #001C55;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #001C55;
+    --foreground: #ffffff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background-image: radial-gradient(circle at top right, rgba(0, 85, 164, 0.05), transparent 400px), 
+                    radial-gradient(circle at bottom left, rgba(0, 155, 58, 0.05), transparent 400px);
+  background-attachment: fixed;
 }
