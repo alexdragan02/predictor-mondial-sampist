@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { login, signup } from './actions'
-import { Trophy, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { login, signup, resetPassword } from './actions'
+import { Trophy, AlertCircle, Eye, EyeOff, ArrowLeft, Mail } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
@@ -17,7 +17,7 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const errorMsg = searchParams.get('error')
 
-  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [password, setPassword] = useState('')
@@ -43,36 +43,46 @@ function LoginForm() {
       <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-3xl p-8 relative z-10">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-brazuca-blue rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-brazuca-blue/30">
-            <Trophy size={32} />
+            {mode === 'forgot' ? <Mail size={32} /> : <Trophy size={32} />}
           </div>
-          <h1 className="text-3xl font-black text-brazuca-dark tracking-tight">Campionat Predictii</h1>
+          <h1 className="text-3xl font-black text-brazuca-dark tracking-tight">
+            {mode === 'forgot' ? 'Resetare Parolă' : 'Campionat Predictii'}
+          </h1>
           <p className="text-gray-500 mt-2 text-center text-sm font-medium">
             {mode === 'login'
               ? 'Intră în cont pentru a vedea meciurile și predicțiile tale.'
-              : 'Creează un cont nou pentru a începe competiția cu prietenii tăi.'}
+              : mode === 'register'
+              ? 'Creează un cont nou pentru a începe competiția cu prietenii tăi.'
+              : 'Introdu email-ul și îți vom trimite un link de resetare.'}
           </p>
         </div>
 
-        {/* Toggle Login / Register */}
-        <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-          <button
-            type="button"
-            onClick={() => { setMode('login'); setMismatch(false) }}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white text-brazuca-blue shadow-sm' : 'text-gray-500'}`}
-          >
-            Autentificare
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMode('register'); setMismatch(false) }}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white text-brazuca-green shadow-sm' : 'text-gray-500'}`}
-          >
-            Înregistrare
-          </button>
-        </div>
+        {/* Toggle Login / Register (hidden in forgot mode) */}
+        {mode !== 'forgot' && (
+          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setMismatch(false) }}
+              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white text-brazuca-blue shadow-sm' : 'text-gray-500'}`}
+            >
+              Autentificare
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('register'); setMismatch(false) }}
+              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white text-brazuca-green shadow-sm' : 'text-gray-500'}`}
+            >
+              Înregistrare
+            </button>
+          </div>
+        )}
 
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-50/50 border border-red-200 text-red-600 text-sm rounded-xl flex items-start gap-3 backdrop-blur-sm">
+          <div className={`mb-6 p-4 border text-sm rounded-xl flex items-start gap-3 backdrop-blur-sm ${
+            errorMsg.includes('Verifică') 
+              ? 'bg-green-50/50 border-green-200 text-green-700' 
+              : 'bg-red-50/50 border-red-200 text-red-600'
+          }`}>
             <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
             <p className="font-medium">{errorMsg}</p>
           </div>
@@ -117,10 +127,52 @@ function LoginForm() {
             </div>
 
             <button
+              type="button"
+              onClick={() => setMode('forgot')}
+              className="text-sm text-brazuca-blue hover:text-brazuca-blue-dark font-bold transition-colors text-right -mt-2"
+            >
+              Ai uitat parola?
+            </button>
+
+            <button
               type="submit"
-              className="w-full bg-brazuca-blue hover:bg-brazuca-blue-dark text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-brazuca-blue/30 active:scale-[0.98] mt-2"
+              className="w-full bg-brazuca-blue hover:bg-brazuca-blue-dark text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-brazuca-blue/30 active:scale-[0.98]"
             >
               Intră în cont
+            </button>
+          </form>
+        )}
+
+        {/* ===== FORGOT PASSWORD FORM ===== */}
+        {mode === 'forgot' && (
+          <form action={resetPassword} className="flex flex-col gap-5">
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-brazuca-dark/80 ml-1" htmlFor="email-forgot">
+                Email
+              </label>
+              <input
+                id="email-forgot"
+                name="email"
+                type="email"
+                required
+                placeholder="nume@exemplu.com"
+                className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brazuca-orange/50 focus:border-brazuca-orange transition-all placeholder:text-gray-400 font-medium text-brazuca-dark"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-brazuca-orange hover:bg-brazuca-orange/90 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-brazuca-orange/30 active:scale-[0.98]"
+            >
+              Trimite link de resetare
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMode('login')}
+              className="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-brazuca-blue font-bold transition-colors"
+            >
+              <ArrowLeft size={16} /> Înapoi la autentificare
             </button>
           </form>
         )}
