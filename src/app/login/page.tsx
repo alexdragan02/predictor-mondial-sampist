@@ -1,11 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { login, signup } from './actions'
 import { Trophy, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const searchParams = useSearchParams()
   const errorMsg = searchParams.get('error')
 
